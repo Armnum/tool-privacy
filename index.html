@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cerca nei Tool — Studio Legale Cucci</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a18;
+    --ink-mid: #4a4a46;
+    --ink-muted: #8a8a84;
+    --paper: #faf8f4;
+    --paper-warm: #f2efe8;
+    --paper-card: #ffffff;
+    --accent: #2c4a6e;
+    --accent-light: #e8eef5;
+    --accent-mid: #4a7aaa;
+    --audio-color: #4a3a6e;
+    --audio-light: #eeebf5;
+    --success: #2d6a4f;
+    --success-light: #e8f5ef;
+    --border: rgba(26,26,24,0.12);
+    --border-mid: rgba(26,26,24,0.22);
+    --radius: 10px;
+    --radius-lg: 16px;
+    --shadow: 0 2px 12px rgba(26,26,24,0.08);
+    --shadow-lg: 0 8px 32px rgba(26,26,24,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.6;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  .site-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .site-header .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .site-header h1 {
+    font-family: 'Lora', serif;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 0.5rem;
+  }
+
+  .site-header .subtitle {
+    font-size: 15px;
+    color: var(--ink-mid);
+    font-weight: 300;
+  }
+
+  /* ── ADMIN PANEL ── */
+  #adminPanel {
+    display: none;
+    background: #f0f4f8;
+    border: 1.5px solid #b0c4d8;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 2rem;
+  }
+
+  #adminPanel.visible { display: block; }
+
+  .admin-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #4a6a8a;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .admin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 520px) { .admin-grid { grid-template-columns: 1fr; } }
+
+  .upload-card {
+    border: 1.5px dashed var(--border-mid);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: var(--paper-card);
+  }
+
+  .upload-card:hover { border-color: var(--accent-mid); background: var(--accent-light); }
+  .upload-card.loaded { border-color: var(--success); border-style: solid; background: var(--success-light); }
+  .upload-card.loaded-audio { border-color: var(--audio-color); border-style: solid; background: var(--audio-light); }
+  .upload-card input { display: none; }
+
+  .upload-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+  .upload-label { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+  .upload-hint { font-size: 11px; color: var(--ink-muted); }
+  .upload-status { font-size: 12px; color: var(--success); font-weight: 500; margin-top: 4px; }
+  .upload-card.loaded-audio .upload-status { color: var(--audio-color); }
+
+  .admin-close {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #4a6a8a;
+    cursor: pointer;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    font-family: 'Source Sans 3', sans-serif;
+  }
+
+  .admin-loaded-info {
+    font-size: 12px;
+    color: var(--success);
+    margin-top: 6px;
+  }
+
+  /* ── SEARCH ── */
+  .search-section { margin-bottom: 2rem; }
+
+  .search-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-mid);
+    margin-bottom: 8px;
+    display: block;
+    letter-spacing: 0.02em;
+  }
+
+  .search-box {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  textarea {
+    flex: 1;
+    border: 1.5px solid var(--border-mid);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    font-size: 15px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 300;
+    color: var(--ink);
+    background: var(--paper-card);
+    resize: none;
+    min-height: 88px;
+    line-height: 1.55;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { outline: none; border-color: var(--accent-mid); }
+  textarea::placeholder { color: var(--ink-muted); font-style: italic; }
+
+  .search-btn {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 4px;
+  }
+
+  .search-btn:hover { background: var(--accent-mid); border-color: var(--accent-mid); }
+  .search-btn:active { transform: scale(0.95); }
+  .search-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* ── STATES ── */
+  .state-msg {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--ink-muted);
+    font-size: 14px;
+    font-style: italic;
+    display: none;
+  }
+
+  .state-msg.visible { display: block; }
+
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-mid);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-bottom: 10px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── RESULTS ── */
+  #results { animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .results-header {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .results-group { margin-bottom: 1.5rem; }
+
+  .group-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .module-card {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+
+  .module-card:hover { box-shadow: var(--shadow-lg); border-color: var(--border-mid); }
+
+  .module-badge {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .module-badge.video { background: var(--accent-light); color: var(--accent); }
+  .module-badge.audio { background: var(--audio-light); color: var(--audio-color); }
+
+  .module-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    font-family: 'Lora', serif;
+  }
+
+  .summary-card {
+    background: var(--paper-warm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.4rem;
+    margin-top: 1.5rem;
+  }
+
+  .summary-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    margin-bottom: 0.6rem;
+    font-weight: 500;
+  }
+
+  .summary-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink-mid);
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 2rem;
+    color: var(--ink-muted);
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  /* ── ADMIN PASSWORD OVERLAY ── */
+  .pwd-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    background: #f0f4f8;
+    border: 1.5px solid #b0c4d8;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.4rem;
+    z-index: 10;
+  }
+
+  .pwd-overlay.visible { display: block; }
+
+  .pwd-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .pwd-row input {
+    flex: 1;
+    border: 1px solid #b0c4d8;
+    border-radius: var(--radius);
+    padding: 7px 10px;
+    font-size: 14px;
+    font-family: 'Source Sans 3', sans-serif;
+    background: #fff;
+    color: var(--ink);
+  }
+
+  .pwd-row input:focus { outline: none; border-color: #4a7aaa; }
+
+  .pwd-btn {
+    padding: 7px 16px;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-family: 'Source Sans 3', sans-serif;
+    cursor: pointer;
+  }
+
+  .pwd-error {
+    font-size: 12px;
+    color: #a33;
+    margin-top: 6px;
+    display: none;
+  }
+
+  .pwd-error.visible { display: block; }
+
+  .site-footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* wrapper for overlay positioning */
+  .admin-wrapper { position: relative; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="site-header">
+    <p class="eyebrow">Studio Legale Cucci · Tool Privacy</p>
+    <h1>Cerca nei tool</h1>
+    <p class="subtitle">Descrivi l'argomento che ti interessa e ti indico i contenuti più adatti</p>
+  </header>
+
+  <!-- Admin wrapper (password overlay + panel) -->
+  <div class="admin-wrapper">
+
+    <!-- Password overlay -->
+    <div class="pwd-overlay" id="pwdOverlay">
+      <div style="font-size:13px; font-weight:500; color:#4a6a8a;">Accesso amministratore</div>
+      <div class="pwd-row">
+        <input type="password" id="pwdInput" placeholder="Password…" onkeydown="if(event.key==='Enter') checkPwd()">
+        <button class="pwd-btn" onclick="checkPwd()">Entra</button>
+      </div>
+      <div class="pwd-error" id="pwdError">Password errata. Riprova.</div>
+    </div>
+
+    <!-- Admin panel (hidden by default) -->
+    <div id="adminPanel">
+      <div class="admin-title">Pannello amministratore — carica le trascrizioni</div>
+      <div class="admin-grid">
+        <div class="upload-card" id="cardVideo" onclick="document.getElementById('fileVideo').click()">
+          <input type="file" id="fileVideo" accept=".pdf">
+          <span class="upload-icon">🎬</span>
+          <div class="upload-label">Trascrizioni videotutorial</div>
+          <div class="upload-hint">File PDF · Video 01–15</div>
+          <div class="upload-status" id="statusVideo"></div>
+        </div>
+        <div class="upload-card" id="cardAudio" onclick="document.getElementById('fileAudio').click()">
+          <input type="file" id="fileAudio" accept=".pdf">
+          <span class="upload-icon">🎧</span>
+          <div class="upload-label">Trascrizioni audiotutorial</div>
+          <div class="upload-hint">File PDF · Audio 00–28</div>
+          <div class="upload-status" id="statusAudio"></div>
+        </div>
+      </div>
+      <button class="admin-close" onclick="closeAdmin()">Chiudi pannello</button>
+    </div>
+
+  </div>
+
+  <!-- Search -->
+  <div class="search-section">
+    <label class="search-label">La tua domanda</label>
+    <div class="search-box">
+      <textarea id="query" placeholder="Es: Cosa devo fare in caso di violazione dei dati? Oppure: Come gestisco il consenso degli utenti?" maxlength="600"></textarea>
+      <button class="search-btn" id="searchBtn" onclick="doSearch()" title="Cerca">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="7.5" cy="7.5" r="5" stroke="white" stroke-width="1.5"/>
+          <line x1="11.5" y1="11.5" x2="16" y2="16" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="state-msg" id="loadingMsg">
+    <div class="spinner"></div><br>
+    Sto analizzando le trascrizioni e cercando i contenuti più rilevanti…
+  </div>
+
+  <!-- Results -->
+  <div id="results"></div>
+
+  <footer class="site-footer">
+    Studio Legale Cucci · Rimini · Privacy &amp; Data Protection
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+// ── CONFIG — sostituisci il valore qui sotto con la tua chiave API ────────────
+const API_KEY = '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';
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL   = 'claude-sonnet-4-20250514';
+const ADMIN_PASSWORD = 'Ridb9!De#n';
+
+// ── Trascrizioni incorporate ──────────────────────────────────────────────────
+const pdfTextVideo = `Video 1 - Introduzione
+Ciao. Oggi ti guiderò nell'apprendere l'utilizzo del software per la gestione del modello privacy aziendale "Qui Privacy". Il software è prodotto dall'azienda italiana Dylog Italia S.p.a. Una volta ottenute le credenziali in seguito all'acquisto della licenza, potrai andare alla pagina di accesso che trovi all'indirizzo www.quiprivacy.it. Clicca sul pulsante arancione con l'indicazione "Accedi a Qui privacy" ed inserisci le tue credenziali. Ti si aprirà l'homepage del portale gestionale dove a centro pagina troverai la sezione denominata "Gestione Aziende – Titolare del Trattamento". Sul lato sinistro della pagina troverai la dashboard con il glossario della terminologia principale, alcuni documenti che contengono fonti normative, le domande frequenti, un link a un servizio di informazione, una sezione per le personalizzazioni del software e le informazioni sulla licenza. Al centro della pagina, sotto la voce "Titolare del Trattamento", troverai una tabella con il nominativo della tua azienda. Andando tutto a destra della stessa riga trovi il tasto "Gestisci privacy". Cliccaci sopra per entrare nella parte viva del gestionale.
+TAG: software privacy, gestione privacy aziendale, GDPR software, modello privacy aziendale, gestionale privacy, titolare del trattamento, compliance GDPR, privacy aziendale
+
+Video 2 - Dati azienda e sedi
+In questo video impareremo a inserire i dati generali. Nella homepage clicca sul pulsante "gestisci privacy" a destra del nome della tua azienda. Seleziona la prima voce della dashboard a sinistra, cioè "Azienda". Si aprirà una pagina con alcuni campi da compilare. Nella casella "personalità" occorre scegliere quale delle tre opzioni suggerite è quella più indicata. Le caselle contrassegnate dall'asterisco vanno obbligatoriamente compilate. Clicchiamo su "salva" e nella dashboard a sinistra selezioniamo la voce "Sedi". Cliccando sulla casella blu "Strumenti" in alto a destra, abbiamo la possibilità di inserire una o più sedi aziendali. È possibile anche importare un file in formato excel per popolare il database del software.
+TAG: dati azienda, anagrafica aziendale, sedi aziendali, gestione sedi, software privacy, GDPR azienda, titolare del trattamento dati, inserimento dati aziendali
+
+Video 3 - Soggetti, funzioni organizzative e asset
+Torniamo alla dashboard a sinistra e selezioniamo la terza voce: Soggetti. Qui vanno inseriti i nominativi di tutti quei soggetti che, a diverso titolo, sono legati all'azienda titolare. Si definisce la personalità, il ruolo e si compilano le varie caselle. Nel nostro caso, inseriamo il responsabile e i soggetti autorizzati. Torniamo alla dashboard a sinistra e selezioniamo la quarta voce: "Funzioni organizzative". Torniamo alla dashboard a sinistra e selezioniamo la quinta voce: Assets. Cliccando la casella "Strumenti" inseriamo un nuovo asset, del quale ci vengono richieste le specifiche: tipologia, categoria ed altre informazioni.
+TAG: soggetti privacy, ruoli GDPR, funzioni organizzative azienda, asset aziendali, gestione soggetti GDPR, responsabile trattamento dati, soggetti autorizzati privacy, struttura organizzativa privacy
+
+Video 4 - Trattamenti
+Torniamo alla dashboard a sinistra e selezioniamo la sesta voce: "Trattamenti". Cliccando su "Nuovo trattamento" si apre una pagina nella quale selezionare il ruolo (di titolare o responsabile) che l'azienda svolge nel trattamento. Quando si crea un nuovo trattamento la pagina mostra lo stato, il ruolo, la denominazione, una breve descrizione. Tornando nel menù a sinistra è possibile passare alla seconda riga: "dati trattati": personali, particolari, giudiziari, relativi alla salute. Occorre inserire un criterio di liceità scelto fra quelli previsti dall'articolo 6 del GDPR: consenso, esecuzione contratto, obbligo legale, legittimo interesse. Si inseriscono anche interessati, durata, asset, destinatari, trasferimenti, misure di sicurezza, ruoli del trattamento (titolare, rappresentante UE, contitolare, responsabile, DPO, soggetti autorizzati) e funzioni organizzative.
+TAG: trattamenti dati personali, gestione trattamenti GDPR, registro trattamenti, trattamento dati aziendali, GDPR trattamenti, consenso, legittimo interesse, basi giuridiche, articolo 6 GDPR, finalità trattamento
+
+Video 5 - Data breach
+Abbiamo quasi completato la serie di informazioni relative ai dati generali dell'Azienda; rimane quella che riguarda i data breach. Cliccando sulla voce "data breach" e selezionando "nuovo evento" vengono richieste informazioni suddivise in 5 aree: dati di sintesi, dati di dettaglio, conseguenze, misure intraprese, valutazione. Occorre stabilire se l'azienda sia titolare o responsabile dei dati personali oggetto della violazione. I dati di sintesi includono: durata, descrizione, natura della violazione (perdita di confidenzialità, integrità e disponibilità), causa, dati oggetto di violazione, interessati, contesti della violazione. Si passa poi alle conseguenze, agli effetti negativi sugli interessati, alle misure intraprese e alla valutazione del rischio. L'ultima sezione permette di generare la notifica al Garante.
+TAG: data breach GDPR, violazione dati personali, gestione data breach, sicurezza dati aziendali, incidenti di sicurezza, notifica garante, registro data breach, 72 ore notifica
+
+Video 6 - Ruoli privacy
+Una volta completata la compilazione di tutti i dati generali relativi all'azienda si passa a definire i ruoli privacy. Cliccando su "Titolari" si apre una nuova finestra all'interno della quale è già evidenziato il titolare. La seconda voce relativa ai ruoli privacy è quella dei rappresentanti in Unione europea. Il procedimento è analogo per il ruolo di DPO, di contitolare, di responsabile e di soggetti autorizzati. Per tutti questi soggetti si può generare la nomina attraverso un modulo fornito dal programma.
+TAG: ruoli privacy GDPR, titolare del trattamento, responsabile del trattamento, DPO, soggetti autorizzati privacy, contitolare trattamento, rappresentante UE GDPR, gestione ruoli privacy, nomina DPO, nomina responsabile
+
+Video 7 - Adempimenti: informative e formazione
+Il menu a tendina a sinistra presenta ora la categoria degli Adempimenti. La prima voce è quella delle Informative, documenti da sottoporre all'interessato relativamente ad ogni trattamento. L'informativa è generabile anche in formato online con un link dedicato. Tornando al menu "Adempimenti" si passa alla voce Formazione. La casella blu "Strumenti" consente di inserire informazioni di dettaglio sui corsi di formazione destinati a tutti coloro che sono preposti al trattamento dei dati personali.
+TAG: informative GDPR, adempimenti privacy, formazione GDPR, documenti privacy aziendali, compliance GDPR documentale, gestione informative, formazione dipendenti privacy, obblighi GDPR azienda, informativa online, articoli 13 14 GDPR
+
+Video 8 - Adempimenti: analisi rischi privacy, registri dei trattamenti e registro data breach
+Dal menu a sinistra selezioniamo la voce: Analisi rischi privacy. Questa è un'analisi di estrema importanza perché fa capire se ogni trattamento è conforme ai requisiti di sicurezza necessari per la salvaguardia dei dati personali e per i diritti e le libertà degli interessati. Il questionario fornisce informazioni circa: perdita di riservatezza, di disponibilità e di integrità. La terza area di lavoro è quella delle CONTROMISURE con le misure di sicurezza da adottare. La nuova pagina permette di generare il Registro in qualità di Titolare e di Responsabile. Si può anche generare il Registro data breach.
+TAG: analisi rischi GDPR, analisi rischi privacy, valutazione rischio privacy, registro trattamenti GDPR, registro data breach, compliance GDPR aziendale, sicurezza dati personali, gestione rischi privacy, articolo 30, registri attività trattamento
+
+Video 9 - Adempimenti: LIA
+Passiamo ora alla voce LIA nel menu ADEMPIMENTI. La LIA rappresenta il test di bilanciamento del legittimo interesse del titolare e va effettuata quando uno dei criteri di liceità di uno specifico trattamento è il legittimo interesse del titolare. Cliccando su "Nuova LIA" si può inserire ed avviare una nuova LIA. Il test verifica se l'interesse del Titolare è maggiore o minore rispetto a quello dell'interessato. Le tre sezioni: Interessi del Titolare, Impatti sugli interessati, Mitigazione del rischio. Il software mostra l'esito del Test di bilanciamento (positivo o negativo).
+TAG: LIA GDPR, legittimo interesse, test bilanciamento, valutazione legittimo interesse, compliance GDPR, trattamento dati legittimo interesse, legitimate interest assessment, articolo 6 GDPR
+
+Video 10 - Adempimenti: DPIA e richieste interessati
+Nella sezione Adempimenti, clicchiamo sulla voce DPIA, Data Protection Impact Assessment (Valutazione di Impatto sulla protezione dei dati). Si apre una pagina con i trattamenti per cui la valutazione del rischio ha restituito un risultato pari ad Alto. Cliccando su "Strumenti" a fianco del trattamento è possibile generare il report DPIA. Passiamo ora alla voce Richieste Interessati. Si apre una nuova pagina in cui è possibile inserire una nuova richiesta o generare il registro delle richieste. Il sistema calcola automaticamente il termine entro cui fornire risposta. Il programma consente di fornire il form di richiesta online per l'esercizio dei diritti: accesso, rettifica, cancellazione, opposizione, portabilità, limitazione.
+TAG: DPIA, valutazione impatto privacy, richieste interessati GDPR, diritti interessati GDPR, gestione richieste, data protection impact assessment, esercizio diritti privacy, articolo 35 GDPR, accesso rettifica cancellazione
+
+Video 11 - Adempimenti: D. lgs. 24/2023 (Whistleblowing)
+La voce successiva, all'interno del menu Adempimenti, ci riporta al Decreto Legislativo 24 del 2023, Whistleblowing. Il programma mette a disposizione tutta la modulistica necessaria. Consente di definire in modo automatico il trattamento "Whistleblowing – Gestione delle segnalazioni". Sono scaricabili le lettere di incarico, le informative dedicate e la predisposizione della DPIA, obbligatoria per il sistema di gestione delle segnalazioni. Il programma fornisce anche un elenco di norme di riferimento e una raccolta di documenti utili.
+TAG: whistleblowing GDPR, D. Lgs. 24/2023, gestione segnalazioni whistleblowing, compliance whistleblowing, DPIA whistleblowing, modulistica whistleblowing, adempimenti whistleblowing, canale segnalazione interna
+
+Video 12 - Adempimenti: Documenti utili
+Riprendendo il menu principale "Adempimenti", l'ultima voce ci conduce alla sezione Documenti utili. Si tratta dei documenti che il Titolare è tenuto a produrre ai fini della Compliance e che il programma mette a disposizione in base ai dati inseriti in precedenza. Tra i documenti si possono trovare: Informative, Nomine, Regolamenti e Report (relativi ad asset, sedi e soggetti). I documenti possono essere selezionati e generati direttamente dal sistema.
+TAG: documenti utili GDPR, compliance documentale, gestione documenti aziendali, informative GDPR, nomine GDPR, regolamenti, report asset, report sedi, report soggetti, documentazione obbligatoria GDPR
+
+Video 13 - Archivio
+Torniamo ora al menu di sinistra per occuparci dell'ultima voce disponibile, Archivio. Questa sezione comprende una sola possibilità di scelta: "Documenti generati". Si apre una nuova finestra che mostra l'elenco completo di tutti i documenti prodotti dall'operatore, ciascuno corredato di data e orario di generazione. Cliccando sulla casella bianca "strumenti" a fianco dei singoli documenti generati è possibile scaricarli o eliminarli.
+TAG: archivio documenti GDPR, gestione documenti generati, compliance documentale, conservazione documenti aziendali, storico documenti, cronologia documenti generati
+
+Video 14 - Utilizzo dei moduli Excel per importare i dati
+Per poter importare i dati occorre utilizzare come modello base il file excel scaricabile da ciascuna sezione in cui ciò è possibile. Due avvertenze: non scrivere mai nulla all'interno delle caselle in cui è presente il menù a tendina; non modificare mai la struttura del file. Una volta compilato il modello, è possibile importarlo attraverso l'apposita finestra. Caricato il file, clicchiamo su "importa" e automaticamente tutti i dati inseriti nel file appariranno nella relativa pagina del programma.
+TAG: importazione dati, esportazione dati, caricamento file Excel, report dati aziendali, gestione dati massiva, import export, modelli Excel GDPR, inserimento dati automatico
+
+Video 15 - Personalizzazioni
+Dalla barra degli strumenti, cliccando sul nome dell'azienda titolare in alto a destra, si apre una tendina dalla quale si può accedere a due diverse pagine di personalizzazione: "Gestione modelli" e "gestione voci menù". Cliccando su "Gestione modelli", la pagina mostra tutti i modelli forniti dal programma che l'utente può scaricare. Cliccando "Aggiungi nuovo modello" è possibile caricare quello personalizzato. I modelli personalizzati inseriti dall'utente possono essere eliminati in ogni momento. Cliccando su "Gestione voci menù", la pagina che si apre presenta un elenco suddiviso in aree con tutte le voci che si possono trovare ogni volta che si apre una tendina per compilare un campo.
+TAG: personalizzazione software GDPR, gestione modelli personalizzati, gestione voci menù, customizzazione modelli, modelli GDPR personalizzati, voci menù personalizzate`;
+
+const pdfTextAudio = `Audio 00 - Carrellata iniziale sugli adempimenti GDPR
+In questo audio-tutorial iniziale voglio spiegarti gli adempimenti principali che vanno a comporre un percorso di adeguamento al GDPR. Il titolare del trattamento deve impostare tutta la propria attività nel rispetto dei principi fondamentali del GDPR: liceità, correttezza e trasparenza, limitazione delle finalità, minimizzazione, esattezza, limitazione della conservazione, integrità, riservatezza e accountability. Il titolare è tenuto alla redazione dei registri delle attività di trattamento, alla nomina del DPO se obbligatoria, alla stipula di accordi con eventuali contitolari, alla stipula con tutti i propri fornitori dei contratti previsti dall'articolo 28 del GDPR. Il titolare deve fornire informative chiare, garantire formazione adeguata, adottare misure di sicurezza, effettuare analisi dei rischi, tenere un registro dei data breach, effettuare il test di bilanciamento LIA quando necessario, verificare i trasferimenti verso paesi extra UE, applicare i principi di privacy by design e by default, rispondere alle richieste degli interessati.
+
+Audio 01 - Cos'è il Trattamento di dati personali?
+Ogni volta che la tua azienda interagisce con una persona fisica si genera automaticamente un "trattamento". Per il GDPR il "trattamento" è qualsiasi operazione effettuata su un dato personale. Rientrano nel concetto di trattamento anche la semplice raccolta, la registrazione su un file, l'organizzazione in cartelle e persino la mera conservazione. Anche quando consulti un dato, lo modifichi o decidi di cancellarlo stai effettuando un trattamento. Nel registro descriverai le attività quotidiane inserendo per ciascuna gli elementi che il GDPR richiede.
+
+Audio 02 - La "descrizione" del trattamento
+In questo tutorial vediamo insieme come compilare il campo "Descrizione del trattamento" nel Registro dei Trattamenti. Il mio consiglio è di considerare questo campo come il titolo o l'etichetta che tu dai a quella specifica attività aziendale. Deve essere un'espressione sintetica, ma sufficientemente chiara. Esempi concreti: "Gestione del rapporto di lavoro e amministrazione del personale", "Gestione anagrafica clienti e fatturazione", "Attività di marketing e invio newsletter", "Videosorveglianza dei locali aziendali". I riferimenti normativi principali sono l'Articolo 30 del GDPR e le indicazioni del Garante nelle FAQ sul Registro delle attività di trattamento.
+
+Audio 03 - I dati personali oggetto di trattamento
+Il dato personale è qualsiasi informazione che riguarda una persona fisica identificata o identificabile. Le categorie di dati: dati personali "comuni" (nome, indirizzo, telefono, email, IBAN, dati finanziari, IP); dati personali "particolari" o sensibili ai sensi dell'Articolo 9 (origine razziale o etnica, opinioni politiche, convinzioni religiose, appartenenza sindacale, dati genetici, dati biometrici, dati relativi alla salute, vita sessuale e orientamento sessuale); dati "giudiziari" (condanne penali, reati, misure di sicurezza). I riferimenti normativi sono l'Articolo 4, 9 e 10 del GDPR.
+
+Audio 04 - I Ruoli chiave della Privacy: chi fa cosa
+I ruoli sono: 1. Il Titolare del Trattamento: decide le finalità e i mezzi del trattamento. 2. I Soggetti Autorizzati (Incaricati): dipendenti che trattano dati sotto l'autorità diretta del titolare. 3. Il Responsabile del Trattamento: soggetto esterno che tratta i dati per conto del Titolare. 4. Il Contitolare del Trattamento: due o più soggetti che determinano congiuntamente finalità e mezzi. 5. Il Terzo: qualsiasi persona che non sia l'interessato, il Titolare, il Responsabile o la Persona Autorizzata. Riferimenti: Articoli 4, 24, 26, 28, 29 del GDPR; Linee guida EDPB 07/2020.
+
+Audio 05 - Chi è il Titolare del Trattamento?
+Il Titolare è il "decisore": il soggetto che ha il potere e la responsabilità di stabilire perché i dati personali vengono trattati (le finalità) e come vengono trattati (i mezzi). Nella stragrande maggioranza dei casi, il Titolare del Trattamento è l'ente nel suo complesso: è l'azienda, il Comune, l'associazione, l'ospedale o la società. Su di lui ricade il principio fondamentale della responsabilizzazione (accountability). Il Titolare non deve solo rispettare le regole, ma deve essere sempre in grado di dimostrare di averlo fatto. Riferimenti: Articolo 4 n.7, 5 par.2, 24, 26 del GDPR; Linee guida EDPB 07/2020.
+
+Audio 06 - Chi è il Responsabile del trattamento?
+Il Responsabile è il "braccio operativo" qualificato del Titolare. Mentre il Titolare decide il "perché" e il "come" trattare i dati, il Responsabile è il soggetto che tratta i dati personali per conto del Titolare. Nella maggior parte dei casi, il Responsabile è un soggetto esterno all'organizzazione: una società, un fornitore di servizi o un libero professionista. Il rapporto deve essere basato su un contratto scritto (DPA, Data Processing Agreement). Il Responsabile deve agire soltanto su istruzione del Titolare. Riferimenti: Articolo 4 n.8, 28, 30 par.2, 32 del GDPR; Linee guida EDPB 07/2020.
+
+Audio 07 - Come capire se sei Titolare o Responsabile
+Per capire se la tua azienda agisce come Titolare o come Responsabile del trattamento, devi analizzare chi detiene il potere decisionale sui dati. Il criterio fondamentale è verificare chi determina le finalità e i mezzi del trattamento. Domande chiave: Chi ha deciso che il trattamento doveva avvenire? La tua azienda agisce per conto di qualcun altro? Chi decide i "mezzi" tecnici fondamentali? Esempi in cui l'azienda è Titolare: gestione dati dipendenti per rapporto di lavoro; studio legale incaricato da un cliente. Esempi in cui l'azienda è Responsabile: provider di servizi internet che ospita dati di clienti; azienda ingaggiata per gestire invio buste paga o campagne di marketing per conto terzi.
+
+Audio 08 - Chi sono i contitolari del trattamento?
+Quando due o più soggetti determinano congiuntamente le finalità e i mezzi di un trattamento di dati personali essi sono tutti considerati contitolari del trattamento. Significa che concordano sia il perché sia il come del trattamento. Quando ciò accade, i soggetti devono definire in modo trasparente, tramite un accordo interno, le rispettive responsabilità. Un ottimo esempio potrebbe essere quello di due aziende che collaborano a una campagna di marketing congiunta. Indipendentemente dall'accordo interno, l'interessato può esercitare i propri diritti nei confronti di ciascuno dei contitolari. Riferimento: Articolo 26 del GDPR.
+
+Audio 09 - Come verifico se c'è contitolare trattamento
+Si ha contitolarità quando due o più soggetti determinano insieme le finalità (il "perché") e i mezzi (il "come") del trattamento dei dati personali. Ti trovi in una contitolarità se: le finalità del trattamento sono strettamente collegate o complementari a quelle di un altro soggetto; tu e l'altro soggetto traete un beneficio reciproco da quell'operazione. Esempi: portale viaggi "tutto compreso" con agenzia, hotel e compagnia aerea; marketing per prodotti co-branded; whistleblowing di gruppo per piccole aziende dello stesso gruppo. Riferimenti: Articolo 26 del GDPR; Linee guida 07/2020 dell'EDPB.
+
+Audio 10 - Adempimenti in caso di contitolarità
+Se tu e uno o più partner determinate insieme finalità e mezzi di un trattamento, siete contitolari. Il primo adempimento fondamentale è stipulare un accordo interno trasparente che definisca "chi fa cosa". Il contenuto minimo deve riguardare la ripartizione dei compiti per l'esercizio dei diritti degli interessati e l'obbligo di fornire l'informativa. È caldamente suggerito includere un punto di contatto unico per gli interessati. L'accordo deve coprire anche: gestione delle misure di sicurezza, notifica di data breach, svolgimento della DPIA. Devi mettere a disposizione degli utenti il contenuto essenziale del vostro accordo e indicare i dati di contatto dei contitolari nel Registro. Riferimento: Articolo 26 del GDPR; Linee Guida 07/2020 EDPB.
+
+Audio 11 - Chi sono gli Interessati
+L'interessato è la persona fisica a cui si riferiscono i dati che tu tratti. È identificata o identificabile tramite nome, numero di identificazione come il codice fiscale, dati sulla posizione, un identificativo online come l'indirizzo IP. Se i dati sono anonimi, il GDPR non si applica più. Se i dati sono pseudonimizzati, essi rimangono dati personali soggetti al GDPR. Nel Registro non devi elencare i singoli nomi delle persone, ma le "categorie di interessati" (Clienti, Dipendenti, Visitatori del sito web, Fornitori) e le "categorie di dati personali" (dati anagrafici, dati di contatto, dati relativi alla salute). Riferimenti: Articoli 4, 5, 24, 30, 13, 14 del GDPR.
+
+Audio 12 - Chi è il DPO-RPD, cosa fa e chi deve averlo?
+L'RPD (Responsabile della Protezione dei Dati), anche detto DPO (Data Protection Officer), è previsto dall'Articolo 37 del GDPR. I suoi compiti: informare e consigliare il titolare e i dipendenti sugli obblighi GDPR; vigilare sull'osservanza del GDPR; agire da punto di contatto per il Garante e gli interessati; fornire parere sulla DPIA. Deve operare in piena indipendenza. La nomina è obbligatoria quando: il trattamento è effettuato da un'autorità pubblica o organismo pubblico; le attività principali consistono in monitoraggio regolare e sistematico degli interessati su larga scala; l'attività principale riguarda il trattamento su larga scala di categorie particolari di dati (dati biometrici, genetici, relativi alla salute) o dati relativi a condanne penali. Riferimenti: Articoli 37, 38, 39 del GDPR; Linee guida RPD WP 243 rev.01.
+
+Audio 13 - Chi sono gli incaricati/designati del trattamento?
+I soggetti autorizzati sono i dipendenti, collaboratori, stagisti che operano stabilmente all'interno dell'organizzazione sotto l'autorità diretta del Titolare o del Responsabile. Non si tratta di figure esterne. Non basta essere assunti per poter trattare i dati: è necessario un atto di designazione o di autorizzazione, solitamente tramite una lettera di incarico. Il soggetto autorizzato non ha autonomia decisionale sulle finalità del trattamento: deve attenersi scrupolosamente alle istruzioni ricevute. Queste persone devono ricevere una formazione adeguata. Riferimenti: Articolo 4 n.10, 29, 32 par.4 del GDPR; Articolo 2-quaterdecies del Codice Privacy (D.Lgs. 196/2003).
+
+Audio 14 - Finalità e basi giuridiche del trattamento
+La Finalità del Trattamento è il motivo per cui stai raccogliendo quei dati. Il GDPR stabilisce che i dati devono essere raccolti per finalità determinate, esplicite e legittime. Il Criterio di liceità (base giuridica) è il "permesso legale" per perseguire lo scopo. Le sei basi giuridiche dell'Articolo 6 del GDPR: 1. Consenso: l'utente ha libertà di dire sì o no. 2. Esecuzione di un contratto: i dati servono per fornire un servizio richiesto. 3. Adempimento di un obbligo legale: la legge ordina di trattare quei dati (es. fatture, enti previdenziali). 4. Salvaguardia degli interessi vitali: per questioni di vita o di morte. 5. Esecuzione di un compito di interesse pubblico: usato quasi esclusivamente dalla Pubblica Amministrazione. 6. Legittimo interesse: il tuo interesse di business è prevalente rispetto ai diritti delle persone (es. videosorveglianza, soft spam verso clienti esistenti, prevenzione frodi). Riferimenti: Articoli 5 e 6 del GDPR.
+
+Audio 15 - La durata del trattamento (data retention)
+Il principio fondamentale è quello della "limitazione della conservazione": i dati personali devono essere conservati solo per il tempo strettamente necessario a raggiungere gli scopi per cui li hai raccolti. Come determini questa durata? Prima strada: c'è una legge che ti impone la durata? (es. norme fiscali o giuslavoristiche, spesso 10 anni). Seconda strada: se non c'è legge specifica, valuta la proporzionalità in base allo scopo e ai termini di prescrizione. Esempi pratici: Videosorveglianza: 24 ore di regola; Whistleblowing: non oltre 5 anni dalla chiusura della procedura; Log degli Amministratori di Sistema: almeno 6 mesi. Riferimenti: Articolo 5 par.1 lett.e), 13 par.2 lett.a), 30 del GDPR.
+
+Audio 16 - Chi sono i destinatari
+Un "destinatario" è qualsiasi persona fisica o giuridica, autorità pubblica o organismo che riceve comunicazione di dati personali da parte tua. Non devi inserire in questa lista i tuoi dipendenti che trattano dati sotto la tua autorità. La normativa ti chiede di indicare le "categorie di destinatari". Esempi: "Studi professionali per consulenza fiscale e del lavoro" (consulente del lavoro per buste paga); "Fornitori di servizi di hosting e cloud"; "Istituti bancari per la gestione dei pagamenti". Le autorità pubbliche che chiedono dati per una singola indagine specifica non sono considerate "destinatari" ai fini del registro. Riferimenti: Articolo 4 n.9 e 30 del GDPR.
+
+Audio 17 - L'informativa
+L'informativa è lo strumento principe della trasparenza nel mondo dei dati personali. È il Titolare del trattamento che ha il compito di scriverla. Al suo interno deve inserire: propria identità e contatti, finalità del trattamento, base giuridica, chi riceverà i dati, per quanto tempo saranno conservati, come l'interessato può esercitare i propri diritti incluso il diritto di reclamo al Garante. Il GDPR impone che l'informativa sia concisa, facilmente accessibile e scritta con un linguaggio semplice e chiaro. Consiglio pratico: approccio stratificato con primo livello breve e link a versione integrale. Se raccogli i dati direttamente dall'interessato, devi dargli l'informativa in quel preciso momento; se li ottieni da altre fonti, hai tempo massimo un mese. Riferimenti: Articoli 12, 13 e 14 del GDPR.
+
+Audio 17 - Registri dei trattamenti Titolare e Responsabile
+Il Registro delle attività di trattamento è la "fotografia" di tutto ciò che accade ai dati personali nella tua organizzazione. È un documento previsto dall'articolo 30 del GDPR. Il registro deve essere in forma scritta, preferibilmente elettronica, sempre aggiornato e disponibile per il Garante. Esistono due tipi di registro: 1. Registro del Titolare: indica chi sei, le finalità, le categorie di dati e di persone coinvolte, i destinatari, se trasferisci dati fuori dall'UE, i termini di cancellazione, le misure di sicurezza. 2. Registro del Responsabile: indica per conto di quali Titolari stai lavorando, quali categorie di trattamenti svolgi per loro, le misure di sicurezza adottate. Riferimento: Articolo 30 del GDPR.
+
+Audio 19 - I mezzi del trattamento
+In questo tutorial chiariamo il termine "asset". L'asset indica le risorse strumentali, fisiche o digitali, che la tua organizzazione utilizza concretamente per trattare le informazioni. Devi elencare le risorse hardware, software e di rete che supportano il trattamento. Esempi: "Server aziendale" per la fatturazione; "CRM in cloud" per la gestione clienti; "Tablet aziendali" per agenti di commercio; archivi cartacei (armadi, cassettiere) con documenti contenenti dati personali. Collegare un trattamento al suo asset è fondamentale per la sicurezza e la valutazione dei rischi. Riferimento: Articolo 32 del GDPR; Linee guida ENISA per le PMI sulla sicurezza del trattamento.
+
+Audio 20 - Il data breach: cos'è e cosa fare
+Un data breach è una violazione di sicurezza che comporta anche accidentalmente la distruzione, la perdita, la modifica, la divulgazione non autorizzata o l'accesso ai dati personali. Si ha una violazione quando viene compromessa la riservatezza, l'integrità o la disponibilità dei dati. Cosa fare: valutare il rischio di danni per le persone. Obblighi: 1. Notifica al Garante entro 72 ore se la violazione presenta un rischio per i diritti e le libertà delle persone. 2. Comunicazione agli interessati se il rischio è elevato. Anche senza obbligo di notifica, devi annotare ogni violazione in un registro interno con: circostanze, conseguenze, provvedimenti adottati. Riferimenti: Articoli 33, 34, 4 del GDPR; Linee guida WP 250 e EDPB 01/2021.
+
+Audio 21 - La DPIA con il software PIA del CNIL
+La DPIA (Data Protection Impact Assessment) è una procedura prevista dall'articolo 35 del GDPR. Serve a descrivere un trattamento, valutarne la necessità e gestire i rischi per i diritti e le libertà delle persone. La DPIA è obbligatoria quando il trattamento può presentare un rischio elevato: uso di nuove tecnologie, trattamento su larga scala, profilazione sistematica, sorveglianza di zone pubbliche, dati biometrici o genetici, intelligenza artificiale. Il software PIA della CNIL segue le Linee Guida europee WP 248. Le quattro fasi: 1. Contesto (descrizione del trattamento, dati trattati, supporti). 2. Principi Fondamentali: finalità, base giuridica, minimizzazione, diritti degli interessati. 3. Rischi: accesso illegittimo, modifica indesiderata, scomparsa dei dati, valutando gravità e verosimiglianza. 4. Validazione: parere del DPO, firma del rappresentante legale. Se il rischio rimane elevato, consultazione preventiva del Garante ai sensi dell'Articolo 36. Riferimenti: Articolo 35 del GDPR; Linee Guida WP 248; Provvedimento Garante n. 467/2018.
+
+Audio 22 - Chi è il Rappresentante UE e quando serve
+Il Rappresentante nell'Unione Europea è una persona fisica o giuridica stabilita in uno dei paesi UE che agisce come punto di contatto per i titolari o responsabili stabiliti fuori dall'UE. Devi nominarlo se non hai alcuno stabilimento nell'UE, ma le tue attività di trattamento riguardano: 1. L'offerta di beni o servizi a persone nell'UE (anche gratuiti); oppure 2. Il monitoraggio del loro comportamento nell'UE. Eccezioni: non devi nominarlo se sei un'autorità pubblica, oppure se il trattamento è occasionale, non riguarda dati sensibili su larga scala ed è improbabile che presenti rischi. Nel Registro devi inserire nome e dati di contatto del Rappresentante. Riferimenti: Articolo 27 e 30 del GDPR; Linee guida 3/2018 dell'EDPB sull'ambito di applicazione territoriale.
+
+Audio 23 - Il contratto di nomina del Rappresentante UE
+Se la tua azienda opera fuori dall'Unione Europea, il Considerando 80 del GDPR richiede che il Rappresentante sia designato tramite un mandato scritto (contratto di servizio o lettera di incarico). Il mandato deve indicare che ha il potere di agire per conto tuo nei confronti del Garante e degli interessati per ogni questione GDPR. Specifica che il Rappresentante deve conservare una copia aggiornata del Registro dei Trattamenti. I dati di contatto del Rappresentante devono essere resi pubblici nell'informativa privacy. Il mandato non trasferisce la responsabilità: tu resti pienamente responsabile di eventuali violazioni. L'EDPB suggerisce che il ruolo di Rappresentante non sia compatibile con quello di DPO esterno. Riferimenti: Articolo 27 e Considerando 80 del GDPR; Linee guida 3/2018 dell'EDPB.
+
+Audio 24 - Analisi dei rischi del trattamento. Come si fa.
+L'analisi dei rischi serve a capire come proteggere davvero le informazioni che gestisci. Significa scattare una fotografia dei pericoli che le tue attività di trattamento possono causare alle persone. Non si tratta di valutare i rischi per la tua azienda, ma di guardare le cose dal punto di vista degli interessati. Il GDPR ti rende responsabile della scelta delle protezioni più adatte (principio di accountability). L'analisi dei rischi è fondamentale anche per capire se devi effettuare una DPIA o notificare un Data Breach al Garante. I quattro passi: 1. Definisci il contesto (dati, strumenti, chi ha accesso). 2. Valuta l'impatto (gravità del danno per la persona). 3. Stima la probabilità (quanto è probabile che la minaccia si verifichi). 4. Calcola il rischio (incrociando gravità e probabilità: Basso, Medio, Alto). Riferimenti: Articoli 24 e 32 del GDPR; Manuale ENISA sulla sicurezza del trattamento.
+
+Audio 25 - Analisi dei rischi secondo linee guida ENISA
+La metodologia ENISA prende i controlli dello standard ISO 27001 e li riduce a misura di piccola e media impresa, focalizzandosi sulla tutela dei diritti e delle libertà delle persone. Fase 1: Trigger della profondità dell'analisi. Si definisce il contesto e si valuta l'impatto in termini di riservatezza, integrità e disponibilità. Se impatto Basso: circa 24 domande. Se impatto Alto o Altissimo: oltre 100 domande derivate da ISO 27001. Le sezioni del questionario: A e B (Politiche e Responsabilità); C, K e M (Controllo degli Accessi, password, autenticazione a due fattori, need to know); D ed E (Asset Management e gestione Cambiamenti); F (Rapporti con i Fornitori, outsourcing, contratti); G e H (Incidenti e Continuità Operativa, backup, test di ripristino); I, J ed N (Personale, Formazione, antiphishing, postazioni di lavoro); O e Q (Rete, crittografia TLS/SSL, dispositivi mobili, cancellazione da remoto); S e T (Sicurezza Fisica, server in stanze chiuse, smaltimento sicuro degli hard disk). Il software produce una "hit-map" o mappa di calore con il Livello di Rischio Residuo (Basso, Medio, Alto). Riferimenti: Articolo 32 del GDPR; Linee Guida ENISA Guidelines for SMEs on the security of personal data processing (2016).
+
+Audio 26 - La LIA (Legitimate Interest Assessment)
+La LIA (Legitimate Interest Assessment) o Valutazione di Bilanciamento degli Interessi è la "prova del nove" che devi superare se vuoi fondare un trattamento di dati personali sul Legittimo Interesse del titolare o di un terzo, invece che sul consenso. La LIA deve essere effettuata prima di iniziare il trattamento (principio di accountability). I principi base secondo le Linee Guida EDPB n.1/2024: Liceità e Trasparenza; Concretezza; Necessità; Bilanciamento. Le tre fasi del test: Fase 1 - Test di Finalità: l'interesse è reale e attuale? Fase 2 - Test di Necessità: il trattamento è davvero indispensabile? principio di minimizzazione. Fase 3 - Test di Bilanciamento: natura dei dati, aspettative dell'utente, impatto e salvaguardie. Simulazione pratica con videosorveglianza per legittimo interesse: dimostrare interesse reale con denunce o statistiche, limitare le riprese allo stretto necessario, informativa con cartello visibile e QR code, conservazione immagini 24-48 ore massimo. Riferimenti: Articolo 6 par.1 lett.f) del GDPR; Linee Guida EDPB n.1/2024 sul legittimo interesse; Linee Guida EDPB n.3/2019 sulla videosorveglianza; Provvedimento Garante dell'8 aprile 2010.
+
+Audio 27 - Le richieste degli interessati
+Le richieste degli interessati sono il "telecomando" che il GDPR mette in mano alle persone fisiche per mantenere il controllo sulla propria vita digitale. I diritti esercitabili: Diritto di Accesso (conferma del trattamento, quali dati, perché, a chi comunicati, per quanto tempo, copia dei dati); Rettifica (correzione dati sbagliati o incompleti); Cancellazione o diritto all'oblio; Diritto di Opposizione (ad es. per marketing diretto); Diritto alla Portabilità (ricevere i propri dati in formato digitale leggibile); Limitazione del trattamento. Cosa fare quando arriva una richiesta: 1. Verifica l'identità dell'interessato. 2. Rispetta i tempi: entro un mese (prorogabile di altri due per richieste complesse). 3. Gratuità della risposta. 4. Risposta chiara e motivata per iscritto. Se decidi di non accogliere la richiesta, devi spiegare il perché e informare l'interessato che può fare reclamo al Garante. Riferimenti: Articoli 12, 15-22 del GDPR; Linee Guida EDPB 01/2022 sul diritto di accesso.
+
+Audio 28 - Whistleblowing e adempimenti privacy
+Il Whistleblowing è la protezione garantita a chi segnala illeciti sul posto di lavoro. Il Decreto Legislativo 24 del 2023 prevede l'obbligo se: hai più di 50 lavoratori subordinati; operi in settori sensibili (servizi finanziari, antiriciclaggio, sicurezza trasporti, tutela ambiente) anche con meno di 50 dipendenti; hai adottato un Modello di Organizzazione e Gestione ai sensi del D.Lgs. 231/2001. Il canale di segnalazione interna deve garantire riservatezza assoluta tramite crittografia e non tracciabilità del segnalante. Check-list operativa: 1. DPIA obbligatoria prima di attivare il sistema (Provvedimento Garante 304/2023). 2. Canale con no-log policy (no email ordinaria o PEC). 3. Nomina del Gestore come Responsabile del Trattamento ex art. 28 GDPR. 4. Informativa Privacy aggiornata per tutti i possibili segnalanti. 5. Data Retention: non oltre 5 anni dalla chiusura della procedura. 6. Aggiornamento del Registro dei Trattamenti art. 30 GDPR. Le aziende con 50-249 dipendenti possono condividere il canale con altre aziende simili diventando Contitolari (accordo ex art. 26 GDPR). Vietate le ritorsioni contro il segnalante (sanzioni fino a 60.000 euro e nullità degli atti). Riferimenti: D.Lgs. 24 del 2023 art.13; Linee Guida ANAC Delibera 311 del 2023; Provvedimento Garante n.304 del 2023.`;
+let adminUnlocked = false;
+
+// ── PDF.js ────────────────────────────────────────────────────────────────────
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+async function extractPdfText(file) {
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(item => item.str).join(' ') + '\n';
+  }
+  return text;
+}
+
+// ── Admin: keyboard shortcut Ctrl+Shift+K ────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && e.key === 'K') {
+    e.preventDefault();
+    if (adminUnlocked) {
+      toggleAdminPanel();
+    } else {
+      showPwdOverlay();
+    }
+  }
+});
+
+function showPwdOverlay() {
+  document.getElementById('pwdOverlay').classList.add('visible');
+  document.getElementById('pwdInput').value = '';
+  document.getElementById('pwdError').classList.remove('visible');
+  setTimeout(() => document.getElementById('pwdInput').focus(), 50);
+}
+
+function checkPwd() {
+  const val = document.getElementById('pwdInput').value;
+  if (val === ADMIN_PASSWORD) {
+    document.getElementById('pwdOverlay').classList.remove('visible');
+    adminUnlocked = true;
+    document.getElementById('adminPanel').classList.add('visible');
+  } else {
+    document.getElementById('pwdError').classList.add('visible');
+    document.getElementById('pwdInput').value = '';
+    document.getElementById('pwdInput').focus();
+  }
+}
+
+function toggleAdminPanel() {
+  const panel = document.getElementById('adminPanel');
+  panel.classList.toggle('visible');
+}
+
+function closeAdmin() {
+  document.getElementById('adminPanel').classList.remove('visible');
+}
+
+// ── File upload handlers (pannello admin — per aggiornamenti futuri) ──────────
+document.getElementById('fileVideo').addEventListener('change', async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('statusVideo').textContent = 'Lettura in corso…';
+  try {
+    const newText = await extractPdfText(file);
+    window._overrideVideo = newText;
+    document.getElementById('cardVideo').className = 'upload-card loaded';
+    document.getElementById('statusVideo').textContent = '✓ ' + file.name + ' (sessione corrente)';
+  } catch(err) {
+    document.getElementById('statusVideo').textContent = 'Errore lettura PDF';
+  }
+});
+
+document.getElementById('fileAudio').addEventListener('change', async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('statusAudio').textContent = 'Lettura in corso…';
+  try {
+    const newText = await extractPdfText(file);
+    window._overrideAudio = newText;
+    document.getElementById('cardAudio').className = 'upload-card loaded-audio';
+    document.getElementById('statusAudio').textContent = '✓ ' + file.name + ' (sessione corrente)';
+  } catch(err) {
+    document.getElementById('statusAudio').textContent = 'Errore lettura PDF';
+  }
+});
+
+// ── Search ────────────────────────────────────────────────────────────────────
+async function doSearch() {
+  const query = document.getElementById('query').value.trim();
+  if (!query) return;
+
+  if (!API_KEY || API_KEY.startsWith('INSERISCI')) {
+    showError('Chiave API non configurata. Apri il file HTML e inserisci la tua chiave API.');
+    return;
+  }
+
+  setLoading(true);
+
+  const activeVideo = window._overrideVideo || pdfTextVideo;
+  const activeAudio = window._overrideAudio || pdfTextAudio;
+
+  let context = '';
+  if (activeVideo) context += '=== TRASCRIZIONI VIDEOTUTORIAL ===\n' + activeVideo + '\n\n';
+  if (activeAudio) context += '=== TRASCRIZIONI AUDIOTUTORIAL ===\n' + activeAudio;
+
+  const systemPrompt = `Sei un assistente professionale specializzato in privacy e GDPR.
+Hai accesso alle trascrizioni complete dei videotutorial (titoli nel formato "Video 01 - Titolo") e degli audiotutorial (titoli nel formato "Audio 00 - Titolo").
+
+Quando l'utente pone una domanda, devi:
+1. Identificare quali video e quali audio trattano l'argomento richiesto
+2. Restituire SOLO un oggetto JSON valido, senza testo aggiuntivo, con questa struttura:
+
+{
+  "video": ["Video 03 - Titolo esatto", "Video 07 - Altro titolo"],
+  "audio": ["Audio 05 - Titolo esatto", "Audio 12 - Altro titolo"],
+  "sintesi": "Spiegazione riassuntiva in italiano (3-5 frasi) che spiega perché questi contenuti rispondono alla domanda, menzionando sia i video che gli audio consigliati."
+}
+
+Se non ci sono video pertinenti usa array vuoto per "video". Idem per "audio".
+La sintesi deve essere in italiano, tono professionale, rivolta direttamente all'utente (usando "tu").
+Non aggiungere mai testo fuori dal JSON.`;
+
+  const userMessage = `Trascrizioni disponibili:\n${context}\n\n---\nDomanda: ${query}`;
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMessage }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'Errore API');
+    }
+
+    const data = await response.json();
+    const raw = data.content.find(b => b.type === 'text')?.text || '';
+
+    let parsed;
+    try {
+      const clean = raw.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch {
+      throw new Error('Risposta non valida dal modello AI');
+    }
+
+    renderResults(parsed, query);
+  } catch(err) {
+    showError('Errore durante la ricerca: ' + err.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ── Render results ────────────────────────────────────────────────────────────
+function renderResults(data, query) {
+  const el = document.getElementById('results');
+  const videos = (data.video || []).filter(Boolean);
+  const audios = (data.audio || []).filter(Boolean);
+  const sintesi = data.sintesi || '';
+
+  if (!videos.length && !audios.length) {
+    el.innerHTML = '<div class="no-results">Nessun contenuto trovato per questa domanda.<br>Prova a riformulare con parole diverse.</div>';
+    return;
+  }
+
+  let html = '<div class="results-header">Contenuti consigliati per: <em>' + escHtml(query) + '</em></div>';
+
+  if (videos.length) {
+    html += '<div class="results-group"><div class="group-label">Videotutorial</div>';
+    videos.forEach(function(v) {
+      html += '<div class="module-card"><div class="module-badge video">' + extractNumber(v) + '</div><div class="module-title">' + escHtml(v) + '</div></div>';
+    });
+    html += '</div>';
+  }
+
+  if (audios.length) {
+    html += '<div class="results-group"><div class="group-label">Audiotutorial</div>';
+    audios.forEach(function(a) {
+      html += '<div class="module-card"><div class="module-badge audio">' + extractNumber(a) + '</div><div class="module-title">' + escHtml(a) + '</div></div>';
+    });
+    html += '</div>';
+  }
+
+  if (sintesi) {
+    html += '<div class="summary-card"><div class="summary-label">Perché questi contenuti</div><div class="summary-text">' + escHtml(sintesi) + '</div></div>';
+  }
+
+  el.innerHTML = html;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function setLoading(on) {
+  document.getElementById('loadingMsg').classList.toggle('visible', on);
+  document.getElementById('searchBtn').disabled = on;
+  if (on) document.getElementById('results').innerHTML = '';
+}
+
+function showError(msg) {
+  document.getElementById('results').innerHTML =
+    '<div class="no-results" style="color:#a33;">' + escHtml(msg) + '</div>';
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function extractNumber(title) {
+  const m = title.match(/\d+/);
+  return m ? m[0] : '?';
+}
+
+document.getElementById('query').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) doSearch();
+});
+</script>
+</body>
+</html>
