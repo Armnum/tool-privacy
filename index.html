@@ -4,472 +4,132 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cerca nei Tool — Studio Legale Cucci</title>
-<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Source+Sans+3:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --ink: #1a1a18;
-    --ink-mid: #4a4a46;
-    --ink-muted: #8a8a84;
-    --paper: #faf8f4;
-    --paper-warm: #f2efe8;
-    --paper-card: #ffffff;
-    --accent: #2c4a6e;
-    --accent-light: #e8eef5;
-    --accent-mid: #4a7aaa;
-    --audio-color: #4a3a6e;
-    --audio-light: #eeebf5;
-    --success: #2d6a4f;
-    --success-light: #e8f5ef;
-    --border: rgba(26,26,24,0.12);
-    --border-mid: rgba(26,26,24,0.22);
-    --radius: 10px;
-    --radius-lg: 16px;
-    --shadow: 0 2px 12px rgba(26,26,24,0.08);
-    --shadow-lg: 0 8px 32px rgba(26,26,24,0.12);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Source Sans 3', sans-serif;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 1.6;
-    background: var(--paper);
-    color: var(--ink);
-    min-height: 100vh;
-  }
-
-  .page {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 4rem;
-  }
-
-  .site-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .site-header .eyebrow {
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--ink-muted);
-    margin-bottom: 0.75rem;
-  }
-
-  .site-header h1 {
-    font-family: 'Lora', serif;
-    font-size: 28px;
-    font-weight: 500;
-    color: var(--ink);
-    line-height: 1.25;
-    margin-bottom: 0.5rem;
-  }
-
-  .site-header .subtitle {
-    font-size: 15px;
-    color: var(--ink-mid);
-    font-weight: 300;
-  }
-
-  /* ── ADMIN PANEL ── */
-  #adminPanel {
-    display: none;
-    background: #f0f4f8;
-    border: 1.5px solid #b0c4d8;
-    border-radius: var(--radius-lg);
-    padding: 1.25rem 1.4rem;
-    margin-bottom: 2rem;
-  }
-
-  #adminPanel.visible { display: block; }
-
-  .admin-title {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #4a6a8a;
-    font-weight: 500;
-    margin-bottom: 1rem;
-  }
-
-  .admin-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  @media (max-width: 520px) { .admin-grid { grid-template-columns: 1fr; } }
-
-  .upload-card {
-    border: 1.5px dashed var(--border-mid);
-    border-radius: var(--radius-lg);
-    padding: 1.1rem;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    background: var(--paper-card);
-  }
-
-  .upload-card:hover { border-color: var(--accent-mid); background: var(--accent-light); }
-  .upload-card.loaded { border-color: var(--success); border-style: solid; background: var(--success-light); }
-  .upload-card.loaded-audio { border-color: var(--audio-color); border-style: solid; background: var(--audio-light); }
-  .upload-card input { display: none; }
-
-  .upload-icon { font-size: 22px; margin-bottom: 6px; display: block; }
-  .upload-label { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
-  .upload-hint { font-size: 11px; color: var(--ink-muted); }
-  .upload-status { font-size: 12px; color: var(--success); font-weight: 500; margin-top: 4px; }
-  .upload-card.loaded-audio .upload-status { color: var(--audio-color); }
-
-  .admin-close {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 12px;
-    color: #4a6a8a;
-    cursor: pointer;
-    text-decoration: underline;
-    background: none;
-    border: none;
-    font-family: 'Source Sans 3', sans-serif;
-  }
-
-  .admin-loaded-info {
-    font-size: 12px;
-    color: var(--success);
-    margin-top: 6px;
-  }
-
-  /* ── SEARCH ── */
-  .search-section { margin-bottom: 2rem; }
-
-  .search-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink-mid);
-    margin-bottom: 8px;
-    display: block;
-    letter-spacing: 0.02em;
-  }
-
-  .search-box {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-
-  textarea {
-    flex: 1;
-    border: 1.5px solid var(--border-mid);
-    border-radius: var(--radius-lg);
-    padding: 14px 16px;
-    font-size: 15px;
-    font-family: 'Source Sans 3', sans-serif;
-    font-weight: 300;
-    color: var(--ink);
-    background: var(--paper-card);
-    resize: none;
-    min-height: 88px;
-    line-height: 1.55;
-    transition: border-color 0.2s;
-  }
-
-  textarea:focus { outline: none; border-color: var(--accent-mid); }
-  textarea::placeholder { color: var(--ink-muted); font-style: italic; }
-
-  .search-btn {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    border: 1.5px solid var(--accent);
-    border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s, transform 0.1s;
-    margin-top: 4px;
-  }
-
-  .search-btn:hover { background: var(--accent-mid); border-color: var(--accent-mid); }
-  .search-btn:active { transform: scale(0.95); }
-  .search-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-  /* ── STATES ── */
-  .state-msg {
-    text-align: center;
-    padding: 2.5rem 1rem;
-    color: var(--ink-muted);
-    font-size: 14px;
-    font-style: italic;
-    display: none;
-  }
-
-  .state-msg.visible { display: block; }
-
-  .spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--border-mid);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin-bottom: 10px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── RESULTS ── */
-  #results { animation: fadeIn 0.3s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-  .results-header {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--ink-muted);
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .results-group { margin-bottom: 1.5rem; }
-
-  .group-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--ink-muted);
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
-
-  .module-card {
-    background: var(--paper-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0.9rem 1.1rem;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: var(--shadow);
-    transition: box-shadow 0.15s, border-color 0.15s;
-  }
-
-  .module-card:hover { box-shadow: var(--shadow-lg); border-color: var(--border-mid); }
-
-  .module-badge {
-    flex-shrink: 0;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 500;
-  }
-
-  .module-badge.video { background: var(--accent-light); color: var(--accent); }
-  .module-badge.audio { background: var(--audio-light); color: var(--audio-color); }
-
-  .module-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--ink);
-    font-family: 'Lora', serif;
-  }
-
-  .summary-card {
-    background: var(--paper-warm);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem 1.4rem;
-    margin-top: 1.5rem;
-  }
-
-  .summary-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--ink-muted);
-    margin-bottom: 0.6rem;
-    font-weight: 500;
-  }
-
-  .summary-text {
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--ink-mid);
-  }
-
-  .no-results {
-    text-align: center;
-    padding: 2rem;
-    color: var(--ink-muted);
-    font-size: 14px;
-    font-style: italic;
-  }
-
-  /* ── ADMIN PASSWORD OVERLAY ── */
-  .pwd-overlay {
-    display: none;
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    background: #f0f4f8;
-    border: 1.5px solid #b0c4d8;
-    border-radius: var(--radius-lg);
-    padding: 1.25rem 1.4rem;
-    z-index: 10;
-  }
-
-  .pwd-overlay.visible { display: block; }
-
-  .pwd-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-  }
-
-  .pwd-row input {
-    flex: 1;
-    border: 1px solid #b0c4d8;
-    border-radius: var(--radius);
-    padding: 7px 10px;
-    font-size: 14px;
-    font-family: 'Source Sans 3', sans-serif;
-    background: #fff;
-    color: var(--ink);
-  }
-
-  .pwd-row input:focus { outline: none; border-color: #4a7aaa; }
-
-  .pwd-btn {
-    padding: 7px 16px;
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
-    background: var(--accent);
-    color: #fff;
-    font-size: 13px;
-    font-family: 'Source Sans 3', sans-serif;
-    cursor: pointer;
-  }
-
-  .pwd-error {
-    font-size: 12px;
-    color: #a33;
-    margin-top: 6px;
-    display: none;
-  }
-
-  .pwd-error.visible { display: block; }
-
-  .site-footer {
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-    text-align: center;
-    font-size: 11px;
-    color: var(--ink-muted);
-    letter-spacing: 0.04em;
-  }
-
-  /* wrapper for overlay positioning */
-  .admin-wrapper { position: relative; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Source Sans 3',sans-serif;font-size:16px;line-height:1.6;background:#faf8f4;color:#1a1a18;min-height:100vh}
+.page{max-width:720px;margin:0 auto;padding:3rem 1.5rem 4rem}
+.header{text-align:center;margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid rgba(26,26,24,.12)}
+.header .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8a8a84;margin-bottom:.75rem}
+.header h1{font-family:'Lora',serif;font-size:26px;font-weight:500;margin-bottom:.4rem}
+.header p{font-size:15px;color:#4a4a46;font-weight:300}
+.search-label{font-size:13px;font-weight:500;color:#4a4a46;margin-bottom:8px;display:block}
+.search-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:2rem}
+textarea{flex:1;border:1.5px solid rgba(26,26,24,.22);border-radius:12px;padding:12px 14px;font-size:15px;font-family:'Source Sans 3',sans-serif;font-weight:300;color:#1a1a18;background:#fff;resize:none;min-height:84px;line-height:1.55}
+textarea:focus{outline:none;border-color:#4a7aaa}
+textarea::placeholder{color:#8a8a84;font-style:italic}
+.btn-cerca{flex-shrink:0;width:46px;height:46px;border:1.5px solid #2c4a6e;border-radius:50%;background:#2c4a6e;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:3px;transition:background .15s,transform .1s}
+.btn-cerca:hover{background:#4a7aaa}
+.btn-cerca:active{transform:scale(.95)}
+.btn-cerca:disabled{opacity:.4;cursor:not-allowed}
+.spinner-wrap{text-align:center;padding:2rem;display:none}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(26,26,24,.15);border-top-color:#2c4a6e;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.results-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#8a8a84;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(26,26,24,.12)}
+.group-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#8a8a84;font-weight:500;margin-bottom:8px;margin-top:1.2rem}
+.group-label:first-child{margin-top:0}
+.card{background:#fff;border:1px solid rgba(26,26,24,.12);border-radius:10px;padding:.85rem 1rem;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.badge{flex-shrink:0;width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500}
+.badge.v{background:#e8eef5;color:#2c4a6e}
+.badge.a{background:#eeebf5;color:#4a3a6e}
+.card-title{font-size:14px;font-weight:500;font-family:'Lora',serif;color:#1a1a18}
+.summary{background:#f2efe8;border:1px solid rgba(26,26,24,.12);border-radius:12px;padding:1.1rem 1.3rem;margin-top:1.5rem}
+.summary-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#8a8a84;margin-bottom:.5rem;font-weight:500}
+.summary-text{font-size:14px;line-height:1.7;color:#4a4a46}
+.empty{text-align:center;padding:2rem;color:#8a8a84;font-size:14px;font-style:italic}
+.error{color:#a33;font-size:14px;text-align:center;padding:1.5rem}
+.footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid rgba(26,26,24,.12);text-align:center;font-size:11px;color:#8a8a84;letter-spacing:.04em}
+/* admin panel */
+.admin-panel{display:none;background:#f0f4f8;border:1.5px solid #b0c4d8;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:2rem}
+.admin-panel.show{display:block}
+.admin-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#4a6a8a;font-weight:500;margin-bottom:1rem}
+.pwd-box{display:flex;gap:8px;margin-top:8px}
+.pwd-box input{flex:1;border:1px solid #b0c4d8;border-radius:8px;padding:7px 10px;font-size:14px;font-family:'Source Sans 3',sans-serif;background:#fff;color:#1a1a18}
+.pwd-box input:focus{outline:none;border-color:#4a7aaa}
+.pwd-btn{padding:7px 16px;border:1px solid #2c4a6e;border-radius:8px;background:#2c4a6e;color:#fff;font-size:13px;font-family:'Source Sans 3',sans-serif;cursor:pointer}
+.pwd-err{font-size:12px;color:#a33;margin-top:6px;display:none}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.upload-card{border:1.5px dashed rgba(26,26,24,.22);border-radius:12px;padding:1rem;text-align:center;cursor:pointer;background:#fff;transition:border-color .2s,background .2s}
+.upload-card:hover{border-color:#4a7aaa;background:#e8eef5}
+.upload-card.ok-v{border-color:#2d6a4f;border-style:solid;background:#e8f5ef}
+.upload-card.ok-a{border-color:#4a3a6e;border-style:solid;background:#eeebf5}
+.upload-card input{display:none}
+.upload-icon{font-size:20px;margin-bottom:5px;display:block}
+.upload-name{font-size:13px;font-weight:500;color:#1a1a18;margin-bottom:2px}
+.upload-hint{font-size:11px;color:#8a8a84}
+.upload-st{font-size:12px;font-weight:500;color:#2d6a4f;margin-top:3px}
+.upload-card.ok-a .upload-st{color:#4a3a6e}
+.admin-close{font-size:12px;color:#4a6a8a;cursor:pointer;text-decoration:underline;background:none;border:none;font-family:'Source Sans 3',sans-serif;margin-top:4px}
 </style>
 </head>
 <body>
 <div class="page">
 
-  <header class="site-header">
+  <header class="header">
     <p class="eyebrow">Studio Legale Cucci · Tool Privacy</p>
     <h1>Cerca nei tool</h1>
-    <p class="subtitle">Descrivi l'argomento che ti interessa e ti indico i contenuti più adatti</p>
+    <p>Descrivi l'argomento che ti interessa e ti indico i contenuti più adatti</p>
   </header>
 
-  <!-- Admin wrapper (password overlay + panel) -->
-  <div class="admin-wrapper">
-
-    <!-- Password overlay -->
-    <div class="pwd-overlay" id="pwdOverlay">
-      <div style="font-size:13px; font-weight:500; color:#4a6a8a;">Accesso amministratore</div>
-      <div class="pwd-row">
-        <input type="password" id="pwdInput" placeholder="Password…" onkeydown="if(event.key==='Enter') checkPwd()">
+  <!-- Admin panel (hidden) -->
+  <div id="adminWrap">
+    <div id="pwdBox" style="display:none;background:#f0f4f8;border:1.5px solid #b0c4d8;border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:2rem">
+      <div style="font-size:13px;font-weight:500;color:#4a6a8a">Accesso amministratore</div>
+      <div class="pwd-box">
+        <input type="password" id="pwdInput" placeholder="Password…" onkeydown="if(event.key==='Enter')checkPwd()">
         <button class="pwd-btn" onclick="checkPwd()">Entra</button>
       </div>
-      <div class="pwd-error" id="pwdError">Password errata. Riprova.</div>
+      <div class="pwd-err" id="pwdErr">Password errata.</div>
     </div>
-
-    <!-- Admin panel (hidden by default) -->
-    <div id="adminPanel">
-      <div class="admin-title">Pannello amministratore — carica le trascrizioni</div>
-      <div class="admin-grid">
-        <div class="upload-card" id="cardVideo" onclick="document.getElementById('fileVideo').click()">
-          <input type="file" id="fileVideo" accept=".pdf">
+    <div class="admin-panel" id="adminPanel">
+      <div class="admin-label">Pannello amministratore — aggiorna le trascrizioni</div>
+      <div class="upload-grid">
+        <div class="upload-card" id="cardV" onclick="document.getElementById('fileV').click()">
+          <input type="file" id="fileV" accept=".pdf">
           <span class="upload-icon">🎬</span>
-          <div class="upload-label">Trascrizioni videotutorial</div>
-          <div class="upload-hint">File PDF · Video 01–15</div>
-          <div class="upload-status" id="statusVideo"></div>
+          <div class="upload-name">Videotutorial</div>
+          <div class="upload-hint">PDF · Video 01–15</div>
+          <div class="upload-st" id="stV"></div>
         </div>
-        <div class="upload-card" id="cardAudio" onclick="document.getElementById('fileAudio').click()">
-          <input type="file" id="fileAudio" accept=".pdf">
+        <div class="upload-card" id="cardA" onclick="document.getElementById('fileA').click()">
+          <input type="file" id="fileA" accept=".pdf">
           <span class="upload-icon">🎧</span>
-          <div class="upload-label">Trascrizioni audiotutorial</div>
-          <div class="upload-hint">File PDF · Audio 00–28</div>
-          <div class="upload-status" id="statusAudio"></div>
+          <div class="upload-name">Audiotutorial</div>
+          <div class="upload-hint">PDF · Audio 00–28</div>
+          <div class="upload-st" id="stA"></div>
         </div>
       </div>
-      <button class="admin-close" onclick="closeAdmin()">Chiudi pannello</button>
+      <button class="admin-close" onclick="document.getElementById('adminPanel').classList.remove('show')">Chiudi pannello</button>
     </div>
-
   </div>
 
   <!-- Search -->
-  <div class="search-section">
-    <label class="search-label">La tua domanda</label>
-    <div class="search-box">
-      <textarea id="query" placeholder="Es: Cosa devo fare in caso di violazione dei dati? Oppure: Come gestisco il consenso degli utenti?" maxlength="600"></textarea>
-      <button class="search-btn" id="searchBtn" onclick="doSearch()" title="Cerca">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="7.5" cy="7.5" r="5" stroke="white" stroke-width="1.5"/>
-          <line x1="11.5" y1="11.5" x2="16" y2="16" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
+  <label class="search-label">La tua domanda</label>
+  <div class="search-row">
+    <textarea id="q" placeholder="Es: Cosa devo fare in caso di violazione dei dati?" maxlength="600"></textarea>
+    <button class="btn-cerca" id="btnCerca" onclick="doSearch()" title="Cerca">
+      <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+        <circle cx="7.5" cy="7.5" r="5" stroke="white" stroke-width="1.6"/>
+        <line x1="11.5" y1="11.5" x2="16" y2="16" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
   </div>
 
-  <!-- Loading -->
-  <div class="state-msg" id="loadingMsg">
-    <div class="spinner"></div><br>
-    Sto analizzando le trascrizioni e cercando i contenuti più rilevanti…
-  </div>
-
-  <!-- Results -->
+  <div class="spinner-wrap" id="loading"><div class="spinner"></div></div>
   <div id="results"></div>
 
-  <footer class="site-footer">
-    Studio Legale Cucci · Rimini · Privacy &amp; Data Protection
-  </footer>
+  <footer class="footer">Studio Legale Cucci · Rimini · Privacy &amp; Data Protection</footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-// ── CONFIG — sostituisci il valore qui sotto con la tua chiave API ────────────
-const API_KEY = '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';
-const API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL   = 'claude-sonnet-4-5-20250929';
-const ADMIN_PASSWORD = 'Ridb9!De#n';
+// ═══════════════════════════════════════════════════════
+// CONFIGURAZIONE — modifica solo questi valori
+const API_KEY   = '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';
+const MODEL     = 'claude-sonnet-4-5-20250929';
+const ADMIN_PWD = 'Ridb9!De#n';
+// ═══════════════════════════════════════════════════════
 
-// ── Trascrizioni incorporate ──────────────────────────────────────────────────
 const pdfTextVideo = `Video 1 - Introduzione
 Ciao. Oggi ti guiderò nell'apprendere l'utilizzo del software per la gestione del modello privacy aziendale "Qui Privacy". Il software è prodotto dall'azienda italiana Dylog Italia S.p.a. Una volta ottenute le credenziali in seguito all'acquisto della licenza, potrai andare alla pagina di accesso che trovi all'indirizzo www.quiprivacy.it. Clicca sul pulsante arancione con l'indicazione "Accedi a Qui privacy" ed inserisci le tue credenziali. Ti si aprirà l'homepage del portale gestionale dove a centro pagina troverai la sezione denominata "Gestione Aziende – Titolare del Trattamento". Sul lato sinistro della pagina troverai la dashboard con il glossario della terminologia principale, alcuni documenti che contengono fonti normative, le domande frequenti, un link a un servizio di informazione, una sezione per le personalizzazioni del software e le informazioni sulla licenza. Al centro della pagina, sotto la voce "Titolare del Trattamento", troverai una tabella con il nominativo della tua azienda. Andando tutto a destra della stessa riga trovi il tasto "Gestisci privacy". Cliccaci sopra per entrare nella parte viva del gestionale.
 TAG: software privacy, gestione privacy aziendale, GDPR software, modello privacy aziendale, gestionale privacy, titolare del trattamento, compliance GDPR, privacy aziendale
@@ -616,232 +276,175 @@ Le richieste degli interessati sono il "telecomando" che il GDPR mette in mano a
 
 Audio 28 - Whistleblowing e adempimenti privacy
 Il Whistleblowing è la protezione garantita a chi segnala illeciti sul posto di lavoro. Il Decreto Legislativo 24 del 2023 prevede l'obbligo se: hai più di 50 lavoratori subordinati; operi in settori sensibili (servizi finanziari, antiriciclaggio, sicurezza trasporti, tutela ambiente) anche con meno di 50 dipendenti; hai adottato un Modello di Organizzazione e Gestione ai sensi del D.Lgs. 231/2001. Il canale di segnalazione interna deve garantire riservatezza assoluta tramite crittografia e non tracciabilità del segnalante. Check-list operativa: 1. DPIA obbligatoria prima di attivare il sistema (Provvedimento Garante 304/2023). 2. Canale con no-log policy (no email ordinaria o PEC). 3. Nomina del Gestore come Responsabile del Trattamento ex art. 28 GDPR. 4. Informativa Privacy aggiornata per tutti i possibili segnalanti. 5. Data Retention: non oltre 5 anni dalla chiusura della procedura. 6. Aggiornamento del Registro dei Trattamenti art. 30 GDPR. Le aziende con 50-249 dipendenti possono condividere il canale con altre aziende simili diventando Contitolari (accordo ex art. 26 GDPR). Vietate le ritorsioni contro il segnalante (sanzioni fino a 60.000 euro e nullità degli atti). Riferimenti: D.Lgs. 24 del 2023 art.13; Linee Guida ANAC Delibera 311 del 2023; Provvedimento Garante n.304 del 2023.`;
-let adminUnlocked = false;
 
-// ── PDF.js ────────────────────────────────────────────────────────────────────
+// Override da pannello admin (opzionale)
+let overrideVideo = null;
+let overrideAudio = null;
+
+// PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-async function extractPdfText(file) {
+async function readPdf(file) {
   const buf = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-  let text = '';
+  const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+  let txt = '';
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    text += content.items.map(item => item.str).join(' ') + '\n';
+    const c = await page.getTextContent();
+    txt += c.items.map(x => x.str).join(' ') + '\n';
   }
-  return text;
+  return txt;
 }
 
-// ── Admin: keyboard shortcut Ctrl+Shift+K ────────────────────────────────────
+document.getElementById('fileV').addEventListener('change', async function(e) {
+  const f = e.target.files[0]; if (!f) return;
+  document.getElementById('stV').textContent = 'Lettura…';
+  try {
+    overrideVideo = await readPdf(f);
+    document.getElementById('cardV').className = 'upload-card ok-v';
+    document.getElementById('stV').textContent = '✓ ' + f.name;
+  } catch { document.getElementById('stV').textContent = 'Errore'; }
+});
+
+document.getElementById('fileA').addEventListener('change', async function(e) {
+  const f = e.target.files[0]; if (!f) return;
+  document.getElementById('stA').textContent = 'Lettura…';
+  try {
+    overrideAudio = await readPdf(f);
+    document.getElementById('cardA').className = 'upload-card ok-a';
+    document.getElementById('stA').textContent = '✓ ' + f.name;
+  } catch { document.getElementById('stA').textContent = 'Errore'; }
+});
+
+// Admin: Ctrl+Shift+K
+let unlocked = false;
 document.addEventListener('keydown', function(e) {
   if (e.ctrlKey && e.shiftKey && e.key === 'K') {
     e.preventDefault();
-    if (adminUnlocked) {
-      toggleAdminPanel();
+    if (unlocked) {
+      document.getElementById('adminPanel').classList.toggle('show');
     } else {
-      showPwdOverlay();
+      const pb = document.getElementById('pwdBox');
+      pb.style.display = pb.style.display === 'none' ? 'block' : 'none';
+      if (pb.style.display === 'block') document.getElementById('pwdInput').focus();
     }
   }
 });
 
-function showPwdOverlay() {
-  document.getElementById('pwdOverlay').classList.add('visible');
-  document.getElementById('pwdInput').value = '';
-  document.getElementById('pwdError').classList.remove('visible');
-  setTimeout(() => document.getElementById('pwdInput').focus(), 50);
-}
-
 function checkPwd() {
-  const val = document.getElementById('pwdInput').value;
-  if (val === ADMIN_PASSWORD) {
-    document.getElementById('pwdOverlay').classList.remove('visible');
-    adminUnlocked = true;
-    document.getElementById('adminPanel').classList.add('visible');
+  if (document.getElementById('pwdInput').value === ADMIN_PWD) {
+    document.getElementById('pwdBox').style.display = 'none';
+    document.getElementById('pwdErr').style.display = 'none';
+    unlocked = true;
+    document.getElementById('adminPanel').classList.add('show');
   } else {
-    document.getElementById('pwdError').classList.add('visible');
+    document.getElementById('pwdErr').style.display = 'block';
     document.getElementById('pwdInput').value = '';
     document.getElementById('pwdInput').focus();
   }
 }
 
-function toggleAdminPanel() {
-  const panel = document.getElementById('adminPanel');
-  panel.classList.toggle('visible');
-}
-
-function closeAdmin() {
-  document.getElementById('adminPanel').classList.remove('visible');
-}
-
-// ── File upload handlers (pannello admin — per aggiornamenti futuri) ──────────
-document.getElementById('fileVideo').addEventListener('change', async function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  document.getElementById('statusVideo').textContent = 'Lettura in corso…';
-  try {
-    const newText = await extractPdfText(file);
-    window._overrideVideo = newText;
-    document.getElementById('cardVideo').className = 'upload-card loaded';
-    document.getElementById('statusVideo').textContent = '✓ ' + file.name + ' (sessione corrente)';
-  } catch(err) {
-    document.getElementById('statusVideo').textContent = 'Errore lettura PDF';
-  }
-});
-
-document.getElementById('fileAudio').addEventListener('change', async function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  document.getElementById('statusAudio').textContent = 'Lettura in corso…';
-  try {
-    const newText = await extractPdfText(file);
-    window._overrideAudio = newText;
-    document.getElementById('cardAudio').className = 'upload-card loaded-audio';
-    document.getElementById('statusAudio').textContent = '✓ ' + file.name + ' (sessione corrente)';
-  } catch(err) {
-    document.getElementById('statusAudio').textContent = 'Errore lettura PDF';
-  }
-});
-
-// ── Search ────────────────────────────────────────────────────────────────────
+// Ricerca
 async function doSearch() {
-  const query = document.getElementById('query').value.trim();
+  const query = document.getElementById('q').value.trim();
   if (!query) return;
 
-  if (!API_KEY || API_KEY.startsWith('INSERISCI')) {
-    showError('Chiave API non configurata. Apri il file HTML e inserisci la tua chiave API.');
+  const key = API_KEY.trim();
+  if (!key || key === 'INSERISCI-QUI-LA-TUA-CHIAVE-API') {
+    showResult('<div class="error">Chiave API non configurata nel file HTML.</div>');
     return;
   }
 
   setLoading(true);
 
-  const activeVideo = window._overrideVideo || pdfTextVideo;
-  const activeAudio = window._overrideAudio || pdfTextAudio;
+  const videoTxt = overrideVideo || pdfTextVideo;
+  const audioTxt = overrideAudio || pdfTextAudio;
+  const context  = '=== VIDEOTUTORIAL ===\n' + videoTxt + '\n\n=== AUDIOTUTORIAL ===\n' + audioTxt;
 
-  let context = '';
-  if (activeVideo) context += '=== TRASCRIZIONI VIDEOTUTORIAL ===\n' + activeVideo + '\n\n';
-  if (activeAudio) context += '=== TRASCRIZIONI AUDIOTUTORIAL ===\n' + activeAudio;
-
-  const systemPrompt = `Sei un assistente professionale specializzato in privacy e GDPR.
-Hai accesso alle trascrizioni complete dei videotutorial (titoli nel formato "Video 01 - Titolo") e degli audiotutorial (titoli nel formato "Audio 00 - Titolo").
-
-Quando l'utente pone una domanda, devi:
-1. Identificare quali video e quali audio trattano l'argomento richiesto
-2. Restituire SOLO un oggetto JSON valido, senza testo aggiuntivo, con questa struttura:
-
-{
-  "video": ["Video 03 - Titolo esatto", "Video 07 - Altro titolo"],
-  "audio": ["Audio 05 - Titolo esatto", "Audio 12 - Altro titolo"],
-  "sintesi": "Spiegazione riassuntiva in italiano (3-5 frasi) che spiega perché questi contenuti rispondono alla domanda, menzionando sia i video che gli audio consigliati."
-}
-
-Se non ci sono video pertinenti usa array vuoto per "video". Idem per "audio".
-La sintesi deve essere in italiano, tono professionale, rivolta direttamente all'utente (usando "tu").
-Non aggiungere mai testo fuori dal JSON.`;
-
-  const userMessage = `Trascrizioni disponibili:\n${context}\n\n---\nDomanda: ${query}`;
+  const system = `Sei un assistente professionale specializzato in privacy e GDPR.
+Hai accesso alle trascrizioni complete dei videotutorial (titoli nel formato "Video 1 - Titolo") e degli audiotutorial (titoli nel formato "Audio 00 - Titolo").
+Quando l'utente pone una domanda, restituisci SOLO un oggetto JSON valido con questa struttura:
+{"video":["Video 3 - Titolo esatto"],"audio":["Audio 05 - Titolo esatto"],"sintesi":"Spiegazione riassuntiva in italiano (3-5 frasi) rivolta direttamente all'utente usando tu."}
+Se non ci sono video pertinenti usa array vuoto. Idem per audio. Non aggiungere mai testo fuori dal JSON.`;
 
   try {
-    const response = await fetch(API_URL, {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
+        'x-api-key': key,
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userMessage }]
+        system: system,
+        messages: [{ role: 'user', content: 'Trascrizioni:\n' + context + '\n\n---\nDomanda: ' + query }]
       })
     });
 
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error?.message || 'Errore API');
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'Errore ' + res.status);
     }
 
-    const data = await response.json();
-    const raw = data.content.find(b => b.type === 'text')?.text || '';
-
+    const data = await res.json();
+    const raw  = (data.content.find(b => b.type === 'text') || {}).text || '';
     let parsed;
-    try {
-      const clean = raw.replace(/```json|```/g, '').trim();
-      parsed = JSON.parse(clean);
-    } catch {
-      throw new Error('Risposta non valida dal modello AI');
-    }
+    try { parsed = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+    catch { throw new Error('Risposta non valida dal modello'); }
 
     renderResults(parsed, query);
   } catch(err) {
-    showError('Errore durante la ricerca: ' + err.message);
+    showResult('<div class="error">Errore: ' + esc(err.message) + '</div>');
   } finally {
     setLoading(false);
   }
 }
 
-// ── Render results ────────────────────────────────────────────────────────────
 function renderResults(data, query) {
-  const el = document.getElementById('results');
-  const videos = (data.video || []).filter(Boolean);
-  const audios = (data.audio || []).filter(Boolean);
+  const videos  = (data.video  || []).filter(Boolean);
+  const audios  = (data.audio  || []).filter(Boolean);
   const sintesi = data.sintesi || '';
 
   if (!videos.length && !audios.length) {
-    el.innerHTML = '<div class="no-results">Nessun contenuto trovato per questa domanda.<br>Prova a riformulare con parole diverse.</div>';
+    showResult('<div class="empty">Nessun contenuto trovato.<br>Prova a riformulare la domanda.</div>');
     return;
   }
 
-  let html = '<div class="results-header">Contenuti consigliati per: <em>' + escHtml(query) + '</em></div>';
+  let h = '<div class="results-title">Contenuti consigliati per: <em>' + esc(query) + '</em></div>';
 
   if (videos.length) {
-    html += '<div class="results-group"><div class="group-label">Videotutorial</div>';
+    h += '<div class="group-label">Videotutorial</div>';
     videos.forEach(function(v) {
-      html += '<div class="module-card"><div class="module-badge video">' + extractNumber(v) + '</div><div class="module-title">' + escHtml(v) + '</div></div>';
+      h += '<div class="card"><div class="badge v">' + num(v) + '</div><div class="card-title">' + esc(v) + '</div></div>';
     });
-    html += '</div>';
   }
-
   if (audios.length) {
-    html += '<div class="results-group"><div class="group-label">Audiotutorial</div>';
+    h += '<div class="group-label">Audiotutorial</div>';
     audios.forEach(function(a) {
-      html += '<div class="module-card"><div class="module-badge audio">' + extractNumber(a) + '</div><div class="module-title">' + escHtml(a) + '</div></div>';
+      h += '<div class="card"><div class="badge a">' + num(a) + '</div><div class="card-title">' + esc(a) + '</div></div>';
     });
-    html += '</div>';
   }
-
   if (sintesi) {
-    html += '<div class="summary-card"><div class="summary-label">Perché questi contenuti</div><div class="summary-text">' + escHtml(sintesi) + '</div></div>';
+    h += '<div class="summary"><div class="summary-label">Perché questi contenuti</div><div class="summary-text">' + esc(sintesi) + '</div></div>';
   }
-
-  el.innerHTML = html;
+  showResult(h);
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 function setLoading(on) {
-  document.getElementById('loadingMsg').classList.toggle('visible', on);
-  document.getElementById('searchBtn').disabled = on;
+  document.getElementById('loading').style.display = on ? 'block' : 'none';
+  document.getElementById('btnCerca').disabled = on;
   if (on) document.getElementById('results').innerHTML = '';
 }
 
-function showError(msg) {
-  document.getElementById('results').innerHTML =
-    '<div class="no-results" style="color:#a33;">' + escHtml(msg) + '</div>';
-}
+function showResult(html) { document.getElementById('results').innerHTML = html; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function num(t) { const m = t.match(/\d+/); return m ? m[0] : '?'; }
 
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function extractNumber(title) {
-  const m = title.match(/\d+/);
-  return m ? m[0] : '?';
-}
-
-document.getElementById('query').addEventListener('keydown', function(e) {
+document.getElementById('q').addEventListener('keydown', function(e) {
   if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) doSearch();
 });
 </script>
